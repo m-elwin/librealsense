@@ -1,6 +1,5 @@
 string(REPLACE ${PROJECT_SOURCE_DIR}/ "" _rel_path ${CMAKE_CURRENT_LIST_DIR})
 
-
 add_subdirectory( "${CMAKE_CURRENT_LIST_DIR}/rsutils" )
 
 pop_security_flags() # remove security flags for third party, as we cannot guarantee their security enforcment
