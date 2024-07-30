@@ -29,15 +29,20 @@ pybind11_add_module(pyrealsense2 SHARED pyrealsense2.h ${PYRS_CPP})
 if (CMAKE_VERSION VERSION_LESS 3.12)
   find_package(PythonInterp REQUIRED)
   find_package(PythonLibs REQUIRED)
-  set(PYTHON_INSTALL_DIR "${CMAKE_INSTALL_LIBDIR}/python${PYTHON_VERSION_MAJOR}.${PYTHON_VERSION_MINOR}/pyrealsense2" CACHE PATH "Installation directory for Python bindings")
-  set(CMAKECONFIG_PY_INSTALL_DIR "${CMAKE_INSTALL_LIBDIR}/cmake/pyrealsense2")
+  set(PYTHON_INSTALL_DIR
+    "${CMAKE_INSTALL_PREFIX}/lib/python${PYTHON_VERSION_MAJOR}.${PYTHON_VERSION_MINOR}/pyrealsense2"
+    CACHE PATH "Installation directory for Python bindings")
+  set(CMAKECONFIG_PY_INSTALL_DIR "${CMAKE_INSTALL_PREFIX}/lib/cmake/pyrealsense2")
 else()
   find_package(Python REQUIRED COMPONENTS Interpreter Development)
-  set(PYTHON_INSTALL_DIR "${CMAKE_INSTALL_LIBDIR}/python${Python_VERSION_MAJOR}.${Python_VERSION_MINOR}/pyrealsense2" CACHE PATH "Installation directory for Python bindings")
-  set(CMAKECONFIG_PY_INSTALL_DIR "${CMAKE_INSTALL_LIBDIR}/cmake/pyrealsense2")
+  set(PYTHON_INSTALL_DIR
+    "${CMAKE_INSTALL_PREFIX}/lib/python${Python_VERSION_MAJOR}.${Python_VERSION_MINOR}/pyrealsense2"
+    CACHE PATH "Installation directory for Python bindings")
+  set(CMAKECONFIG_PY_INSTALL_DIR "${CMAKE_INSTALL_PREFIX}/lib/cmake/pyrealsense2")
 endif()
 
 target_link_libraries(pyrealsense2 PRIVATE ${DEPENDENCIES})
+target_include_directories(pyrealsense2 PRIVATE ../../src)
 set_target_properties(pyrealsense2 PROPERTIES VERSION
     ${REALSENSE_VERSION_STRING} SOVERSION "${REALSENSE_VERSION_MAJOR}.${REALSENSE_VERSION_MINOR}")
 set_target_properties( pyrealsense2
@@ -139,48 +144,54 @@ if(${BACKEND} STREQUAL RS2_USE_LIBUVC_BACKEND)
 endif()
 
 if( BUILD_LEGACY_PYBACKEND )
-pybind11_add_module(pybackend2 SHARED ${RAW_RS})
-
-if(USE_EXTERNAL_USB)
+  pybind11_add_module(pybackend2 SHARED ${RAW_RS})
+  if(USE_EXTERNAL_USB)
     add_dependencies(pybackend2 libusb)
-endif()
-target_link_libraries(pybackend2 PRIVATE rsutils usb ${CMAKE_THREAD_LIBS_INIT})
-set_target_properties(pybackend2 PROPERTIES
-                        VERSION     ${REALSENSE_VERSION_STRING}
-                        SOVERSION   ${REALSENSE_VERSION_MAJOR})
-set_target_properties( pybackend2
+  endif()
+  target_link_libraries(pybackend2 PRIVATE rsutils usb ${CMAKE_THREAD_LIBS_INIT})
+  set_target_properties(pybackend2 PROPERTIES
+    VERSION     ${REALSENSE_VERSION_STRING}
+    SOVERSION   ${REALSENSE_VERSION_MAJOR})
+  set_target_properties( pybackend2
     PROPERTIES
-        FOLDER Library/Python
-    )
-target_include_directories(pybackend2 PRIVATE ${CMAKE_SOURCE_DIR}/include)
+    FOLDER Library/Python
+  )
+  target_include_directories(pybackend2 PRIVATE ${CMAKE_SOURCE_DIR}/include)
 
-if(${FORCE_RSUSB_BACKEND})
-if(APPLE)
-    target_include_directories(pybackend2 PRIVATE ${CMAKE_SOURCE_DIR}/third-party/hidapi/)
-endif()
-endif()
-
-if(${BACKEND} STREQUAL RS2_USE_V4L2_BACKEND)
-    if(UDEV_FOUND)
-        target_sources( pybackend2
-            PRIVATE
-                ../../src/linux/udev-device-watcher.cpp
-                ../../src/linux/udev-device-watcher.h
-            )
-        target_link_libraries( pybackend2 PRIVATE udev )
-        target_compile_definitions( pybackend2 PRIVATE -DUSING_UDEV )
+  if(${FORCE_RSUSB_BACKEND})
+    if(APPLE)
+      target_include_directories(pybackend2 PRIVATE ${CMAKE_SOURCE_DIR}/third-party/hidapi/)
     endif()
-endif()
+  endif()
 
-install(TARGETS pybackend2 pyrealsense2
+  if(${BACKEND} STREQUAL RS2_USE_V4L2_BACKEND)
+    if(UDEV_FOUND)
+      target_sources( pybackend2
+        PRIVATE
+        ../../src/linux/udev-device-watcher.cpp
+        ../../src/linux/udev-device-watcher.h
+      )
+      target_link_libraries( pybackend2 PRIVATE udev )
+      target_compile_definitions( pybackend2 PRIVATE -DUSING_UDEV )
+    endif()
+  endif()
+
+  install(TARGETS pybackend2 pyrealsense2
     EXPORT pyrealsense2Targets
     RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
     LIBRARY DESTINATION ${PYTHON_INSTALL_DIR}
     ARCHIVE DESTINATION ${PYTHON_INSTALL_DIR}
-)
+  )
 
-target_include_directories(pybackend2 PRIVATE ../../src)
-endif()  # BUILD_LEGACY_PYBACKEND
+  target_include_directories(pybackend2 PRIVATE ../../src)
+else()  # BUILD_LEGACY_PYBACKEND
+  install(TARGETS pyrealsense2
+    EXPORT pyrealsense2Targets
+    RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
+    LIBRARY DESTINATION ${PYTHON_INSTALL_DIR}
+    ARCHIVE DESTINATION ${PYTHON_INSTALL_DIR}
+  )
+endif()
 
 write_basic_package_version_file("${CMAKE_CURRENT_BINARY_DIR}/pyrealsense2ConfigVersion.cmake"
     VERSION ${REALSENSE_VERSION_STRING} COMPATIBILITY AnyNewerVersion)
@@ -204,7 +215,6 @@ install(FILES "${CMAKE_BINARY_DIR}/wrappers/python/pyrealsense2ConfigVersion.cma
     DESTINATION ${CMAKECONFIG_PY_INSTALL_DIR}
 )
 
-target_include_directories(pyrealsense2 PRIVATE ../../src)
 
 if (BUILD_PYTHON_DOCS)
     add_subdirectory(docs)
