@@ -64,8 +64,14 @@ macro(global_set_flags)
     endif()
 
     if(BUILD_PYTHON_BINDINGS)
-        include(libusb_config)
-        include(CMake/external_pybind11.cmake)
+      include(libusb_config)
+      cmake_policy(SET CMP0057 NEW)
+      set(PYBIND11_FINDPYTHON ON)
+      find_package(pybind11)
+      set(PYTHON_INSTALL_DIR
+        "${CMAKE_INSTALL_PREFIX}/lib/python${Python_VERSION_MAJOR}.${Python_VERSION_MINOR}/site-packages"
+        CACHE PATH "Installation directory for Python bindings")
+      set(CMAKECONFIG_PY_INSTALL_DIR "${CMAKE_INSTALL_PREFIX}/lib/cmake/pyrealsense2")
     endif()
 
     if(CHECK_FOR_UPDATES)
@@ -80,7 +86,7 @@ macro(global_set_flags)
             add_definitions(-DCHECK_FOR_UPDATES)
         endif()
     endif()
-        
+
     add_definitions(-D${BACKEND} -DUNICODE)
 endmacro()
 
