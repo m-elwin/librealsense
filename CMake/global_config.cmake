@@ -69,7 +69,7 @@ macro(global_set_flags)
       set(PYBIND11_FINDPYTHON ON)
       find_package(pybind11)
       set(PYTHON_INSTALL_DIR
-        "${CMAKE_INSTALL_PREFIX}/lib/python${Python_VERSION_MAJOR}.${Python_VERSION_MINOR}/site-packages"
+        "${CMAKE_INSTALL_PREFIX}/lib/python${Python_VERSION_MAJOR}.${Python_VERSION_MINOR}/dist-packages"
         CACHE PATH "Installation directory for Python bindings")
       set(CMAKECONFIG_PY_INSTALL_DIR "${CMAKE_INSTALL_PREFIX}/lib/cmake/pyrealsense2")
     endif()
