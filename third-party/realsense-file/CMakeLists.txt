@@ -4,7 +4,9 @@ set(REALSENSE_FILE_TARGET realsense-file)
 
 set(ROSBAG2_COMPILE_FLAGS)
 if(BUILD_ROSBAG2)
-    include(${PROJECT_SOURCE_DIR}/CMake/external_sqlite3.cmake)
+    # Fork: use Ubuntu's sqlite3 
+    # instead of: include(${PROJECT_SOURCE_DIR}/CMake/external_sqlite3.cmake)
+    find_package(SQLite3)
     include(${PROJECT_SOURCE_DIR}/CMake/external_yaml_cpp.cmake)
 endif()
 include(${CMAKE_CURRENT_LIST_DIR}/config.cmake)
@@ -59,13 +61,15 @@ if (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
 endif()
 
 if(BUILD_ROSBAG2)
-    add_dependencies(${REALSENSE_FILE_TARGET} sqlite3_lib)
+    # Fork: Updating to modern sqlite3	
+    # Not needed since we aren't building it: add_dependencies(${REALSENSE_FILE_TARGET} sqlite_lib)
     add_dependencies(${REALSENSE_FILE_TARGET} yaml_cpp)
 endif()
 
 target_link_libraries(${REALSENSE_FILE_TARGET} PUBLIC rs_lz4)
 if(BUILD_ROSBAG2)
-    target_link_libraries(${REALSENSE_FILE_TARGET} PRIVATE sqlite3_lib)
+    # Fork: Using Ubuntu's built-in sqlite
+    target_link_libraries(${REALSENSE_FILE_TARGET} PRIVATE SQLite::SQLite3)
 endif()
 
 #set_target_properties(${REALSENSE_FILE_TARGET} PROPERTIES VERSION "${LIBVERSION}" SOVERSION "${LIBSOVERSION}")
@@ -75,9 +79,12 @@ set_target_properties (${REALSENSE_FILE_TARGET} PROPERTIES FOLDER Library)
 set(CMAKECONFIG_INSTALL_DIR "${CMAKE_INSTALL_LIBDIR}/../cmake/realsense2")
 
 set(_install_targets ${REALSENSE_FILE_TARGET} rs_lz4)
-if(BUILD_ROSBAG2)
-    list(APPEND _install_targets sqlite3_lib)
-endif()
+
+# Fork: No longer need to install sqlite_lib since we are not building it
+# if(BUILD_ROSBAG2)
+#    list(APPEND _install_targets sqlite_lib)
+# endif()
+
 install(TARGETS ${_install_targets}
     EXPORT realsense2Targets
     RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
