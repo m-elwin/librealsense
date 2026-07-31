@@ -73,7 +73,9 @@ else()
     if(BUILD_ROSBAG2)
         # Even without full DDS support, we need fastcdr for ROS2 bag file serialization
         message(STATUS "Building with FastCDR for ROS2 bag support")
-        include(CMake/external_fastcdr.cmake)
+	# Fork: Build with ubuntu's fastcdr library
+	# instead of: include(CMake/external_fastcdr.cmake)
+	find_package(fastcdr)
         target_link_libraries( ${LRS_TARGET} PRIVATE fastcdr )
     endif()
 endif()

@@ -18,6 +18,7 @@ char dummy;
 
 #include "Imu.h"
 #include <fastcdr/Cdr.h>
+#include "cdr_aux.h"
 
 #include <fastcdr/exceptions/BadParamException.h>
 using namespace eprosima::fastcdr::exception;

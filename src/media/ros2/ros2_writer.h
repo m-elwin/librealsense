@@ -71,10 +71,10 @@ namespace librealsense
             auto total_size = T::getCdrSerializedSize(data) + CDR_HEADER_SIZE;
             auto& buffer = ensure_buffer_capacity(_cdr_buf, total_size);
             eprosima::fastcdr::FastBuffer fb(reinterpret_cast<char*>(buffer->buffer), total_size);
-            eprosima::fastcdr::Cdr cdr(fb, eprosima::fastcdr::Cdr::DEFAULT_ENDIAN, eprosima::fastcdr::Cdr::DDS_CDR);
+            eprosima::fastcdr::Cdr cdr(fb, eprosima::fastcdr::Cdr::DEFAULT_ENDIAN, eprosima::fastcdr::CdrVersion::DDS_CDR);
             cdr.serialize_encapsulation();
             data.serialize(cdr);
-            buffer->buffer_length = static_cast<size_t>(cdr.getSerializedDataLength());
+            buffer->buffer_length = static_cast<size_t>(cdr.get_serialized_data_length());
 
             // Write to storage
             ensure_topic(topic, msg_type);

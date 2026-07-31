@@ -43,7 +43,7 @@ namespace librealsense
             eprosima::fastcdr::FastBuffer fb(
                 reinterpret_cast<char*>(msg->serialized_data->buffer),
                 msg->serialized_data->buffer_length);
-            eprosima::fastcdr::Cdr cdr(fb, eprosima::fastcdr::Cdr::DEFAULT_ENDIAN, eprosima::fastcdr::Cdr::DDS_CDR);
+            eprosima::fastcdr::Cdr cdr(fb, eprosima::fastcdr::Cdr::DEFAULT_ENDIAN, eprosima::fastcdr::CdrVersion::DDS_CDR);
             cdr.read_encapsulation();
             T data{};
             data.deserialize(cdr);
