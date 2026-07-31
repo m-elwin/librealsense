@@ -1,3 +1,8 @@
+This fork enables building on Ubuntu's ppa buildfarm (launchpad)
+Available at [https://launchpad.net/~numsr/+archive/ubuntu/robotics](https://launchpad.net/~numsr/+archive/ubuntu/robotics)
+
+Changes:
+1. Uses Ubuntu pybind11 instead of downloading pybind11 externally
 <p align="center">
 <!-- Light mode -->
 <img src="doc/img/realsense-logo-light-mode.png#gh-light-mode-only" alt="Logo for light mode" width="30%"/>

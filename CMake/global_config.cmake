@@ -76,7 +76,12 @@ macro(global_set_flags)
 
     if(BUILD_PYTHON_BINDINGS)
         include(libusb_config)
-        include(CMake/external_pybind11.cmake)
+	# Forked Modification: Use Ubuntu pybind11 so it builds on launchpad
+	# instead of: include(CMake/external_pybind11.cmake)
+	find_package(pybind11)
+	find_package(Python REQUIRED COMPONENTS Interpreter Development)
+	set( PYTHON_INSTALL_DIR "${Python_SITEARCH}/pyrealsense2" 
+		CACHE PATH "Installation directory for Python bindings")
     endif()
 
     if(CHECK_FOR_UPDATES)
