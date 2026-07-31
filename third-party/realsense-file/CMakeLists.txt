@@ -7,7 +7,10 @@ if(BUILD_ROSBAG2)
     # Fork: use Ubuntu's sqlite3 
     # instead of: include(${PROJECT_SOURCE_DIR}/CMake/external_sqlite3.cmake)
     find_package(SQLite3)
-    include(${PROJECT_SOURCE_DIR}/CMake/external_yaml_cpp.cmake)
+
+    # Fork: use Ubuntu's yaml_cpp
+    # instead of: include(${PROJECT_SOURCE_DIR}/CMake/external_yaml_cpp.cmake)
+    find_package(yaml-cpp)
 endif()
 include(${CMAKE_CURRENT_LIST_DIR}/config.cmake)
 
@@ -63,7 +66,9 @@ endif()
 if(BUILD_ROSBAG2)
     # Fork: Updating to modern sqlite3	
     # Not needed since we aren't building it: add_dependencies(${REALSENSE_FILE_TARGET} sqlite_lib)
-    add_dependencies(${REALSENSE_FILE_TARGET} yaml_cpp)
+
+    # Fork: Using external yaml_cpp
+    # Not needed since we aren't building it: add_dependencies(${REALSENSE_FILE_TARGET} yaml_cpp)
 endif()
 
 target_link_libraries(${REALSENSE_FILE_TARGET} PUBLIC rs_lz4)
