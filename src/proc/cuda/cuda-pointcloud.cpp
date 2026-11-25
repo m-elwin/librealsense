@@ -13,6 +13,9 @@ namespace librealsense
         // When NEON is available, inherit from pointcloud_neon which calls pointcloud("Pointcloud (NEON)")
         // We keep the NEON name since this is a hybrid using CUDA for depth_to_points and NEON for get_texture_map
         : pointcloud_neon()
+#elif defined(__SSSE3__)
+        // Hybrid: CUDA for depth_to_points, SSE for get_texture_map
+        : pointcloud_sse()
 #else
         : pointcloud("Pointcloud (CUDA)")
 #endif

@@ -5,10 +5,13 @@
 #include "../pointcloud.h"
 #include <memory>
 
-// When both CUDA and NEON are available, inherit from pointcloud_neon
-// to get NEON optimizations for methods not accelerated by CUDA
+// When CUDA is combined with NEON (ARM) or SSE (x86), inherit from the SIMD
+// implementation to get its optimizations for methods not accelerated by CUDA
+// (notably get_texture_map). Otherwise those fall back to the scalar code.
 #if defined(__ARM_NEON) && defined(BUILD_WITH_NEON) && !defined(ANDROID)
 #include "../neon/neon-pointcloud.h"
+#elif defined(__SSSE3__)
+#include "../sse/sse-pointcloud.h"
 #endif
 
 namespace rscuda { class pointcloud_cuda_helper; } // forward declaration (full def in cuda-pointcloud.cuh)
@@ -17,6 +20,8 @@ namespace librealsense
 {
 #if defined(__ARM_NEON) && defined(BUILD_WITH_NEON) && !defined(ANDROID)
     class pointcloud_cuda : public pointcloud_neon
+#elif defined(__SSSE3__)
+    class pointcloud_cuda : public pointcloud_sse
 #else
     class pointcloud_cuda : public pointcloud
 #endif
